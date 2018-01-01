@@ -19,7 +19,7 @@ Self-Driving Car Engineer Nanodegree Program
   * Run either `./install-mac.sh` or `./install-ubuntu.sh`.
   * If you install from source, checkout to commit `e94b6e1`, i.e.
     ```
-    git clone https://github.com/uWebSockets/uWebSockets 
+    git clone https://github.com/uWebSockets/uWebSockets
     cd uWebSockets
     git checkout e94b6e1
     ```
@@ -33,7 +33,7 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 1. Clone this repo.
 2. Make a build directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
-4. Run it: `./pid`. 
+4. Run it: `./pid`.
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
@@ -50,49 +50,27 @@ using the following settings:
 
 Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
 
-## Project Instructions and Rubric
+## Rubric Points
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/824/view) individually and describe how I addressed each point in my implementation.
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
+---
+### Your code should compile
+I added the class Twiddle (`Twiddle.h` and `Twiddle.cpp`), therefore `CMakeLists.txt` has been updated accordingly. Code compiles with `cmake` and `make` without errors.
 
-## Hints!
+### The PID procedure and P, I, D components
+The PID implementation follows what was taught in the lessons. For integral error, the recent 10 CTE errors are taken, but not all.
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+P: Proportional - the correction is applied to the control variable which is proportional to the difference between desired value and reference value.
+I: Integral - magnifies the effect of long-term steady-state errors, applying ever-increasing effort until they reduce to zero
+D: Derivative - concerned with the rate-of-change of the error with time. If the measured variable approaches the setpoint rapidly, then the actuator is backed off early to allow it to coast to the required level.
 
-## Call for IDE Profiles Pull Requests
+### Describe how the final hyperparameters were chosen
+I combined manual tuning and twiddle to choose the final hyperparameters. The manual tuning helped me find the rough values which could keep vehicle on the track and twiddle helped to further tune the parameters to get the final result with minimum CTE errors.
 
-Help your fellow students!
+To make it convenient, my app supports running in two modes: 'twiddle' and 'pid'. When run `./pid twiddle` it starts using twiddle to tune parameters. When run `./pid` or `./pid Kp Ki Kd` it runs in 'pid' mode with default or provided parameters to control how vehicle runs.
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
+The twiddle algorithm is implemented in class Twiddle. To avoid unnecessary waiting, class Twiddle will check the speed and CTE error (in `Twiddle.cpp`, lines 60 ~ 64 ) to determine whether vehicle is stuck or runs too far away. If it is, this round of tuning will be terminated and starts next one. We will send the 'reset' message to simulator (in `main.cpp`, lines 81 ~ 85) before starts new round testing to make sure the vehicle is in good shape.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
+### The vehicle must successfully drive a lap around the track
+Yes, the vehicle will successfully drive around the track with the chosen parameters. Please see the video.mp4 for details.
