@@ -62,7 +62,9 @@ I added the class Twiddle (`Twiddle.h` and `Twiddle.cpp`), therefore `CMakeLists
 The PID implementation follows what was taught in the lessons. For integral error, the recent 10 CTE errors are taken, but not all.
 
 P: Proportional - the correction is applied to the control variable which is proportional to the difference between desired value and reference value.
+
 I: Integral - magnifies the effect of long-term steady-state errors, applying ever-increasing effort until they reduce to zero
+
 D: Derivative - concerned with the rate-of-change of the error with time. If the measured variable approaches the setpoint rapidly, then the actuator is backed off early to allow it to coast to the required level.
 
 ### Describe how the final hyperparameters were chosen
