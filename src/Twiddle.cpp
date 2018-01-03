@@ -1,10 +1,12 @@
 #include "Twiddle.h"
 #include <math.h>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
-static const int eval_steps     = 4000;
+static const int eval_steps     = 2000;
+static const int minimum_steps   = 700;
 static const double tolerence   = 0.2;
 static const int number_of_recent_speeds = 10;
 
@@ -102,18 +104,25 @@ void Twiddle::UpdateSpeed(double speed) {
 }
 
 void Twiddle::CheckCTEs() {
-    cteInRange = (pid.i_error <= cte_threshold);
+    cteInRange = (fabs(pid.i_error) <= cte_threshold);
 }
 
 void Twiddle::AdjustParam() {
     if (isStuck) {
-        cout << "Vehicle is stuck. Skip. Steps taken: " << steps << endl;
+        cout << "Vehicle is stuck. Skip.";
     }
     if (!cteInRange) {
-        cout << "CTE is out of range, pid.i_error: " << pid.i_error << ". Skip. Steps taken: " << steps << endl;
+        cout << "CTE is out of range. Skip.";
     }
-    current_error = sqrt(current_error / steps);
-    cout << "Tuned p: [" << p[0] << " " << p[1] << " " << p[2] << "]. Current Error: " << current_error << ", Prev Best Error: " << best_error << endl;
+    cout << " pid.i_error: " << pid.i_error << ", Steps: " << steps << endl;
+    if (steps < minimum_steps) {
+        // Ignore the result if it doesn't run the minium steps
+        current_error = std::numeric_limits<double>::max();
+        cout << "Insufficent steps taken, result ignored. Prev Best Error: " << best_error << endl;
+    } else {
+        current_error = sqrt(current_error / steps);
+        cout << "Tuned p: [" << p[0] << " " << p[1] << " " << p[2] << "]. Current Error: " << current_error << ", Prev Best Error: " << best_error << endl;
+    }
     if (is_first_round) {
         best_error = current_error;
         for (int i=0; i < number_of_params; i++) {

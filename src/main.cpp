@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
                         json msgJson;
                         msgJson["steering_angle"] = steer_value;
                         msgJson["throttle"] = 0.3;
+//                        msgJson["throttle"] = 1 - 0.5 * fabs(steer_value);
                         auto msg = "42[\"steer\"," + msgJson.dump() + "]";
                         if (!twiddle_mode) {
                             // DEBUG
