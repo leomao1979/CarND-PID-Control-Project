@@ -3,6 +3,12 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+[//]: # (Image References)
+
+[cte_final]: ./output/ctes_final.png "CTE Final"
+[cte_1]: ./output/ctes_02_005_418.png "CTE 1"
+[cte_2]: ./output/ctes_02_008_0.png "CTE 2"
+
 ## Dependencies
 
 * cmake >= 3.5
@@ -66,6 +72,17 @@ P: Proportional - the correction is applied to the control variable which is pro
 I: Integral - magnifies the effect of long-term steady-state errors, applying ever-increasing effort until they reduce to zero
 
 D: Derivative - concerned with the rate-of-change of the error with time. If the measured variable approaches the setpoint rapidly, then the actuator is backed off early to allow it to coast to the required level.
+
+Below are the "CTE vs time" with different combinations of parameters.
+
+Final Parameters (Kp: 0.2, Ki: 0.0082805, Kd: 4.18)
+![CTE Final][cte_final]
+
+Parameters (Kp: 0.2, **Ki: 0.05**, Kd: 4.18) - I Parameter is about 5 times larger than Ki of final parameters
+![CTE 1][cte_1]
+
+Parameters (Kp: 0.2, Ki: 0.0082805, **Kd: 0**) - D Parameter is removed
+![CTE 2][cte_2]
 
 ### Describe how the final hyperparameters were chosen
 I combined manual tuning and twiddle to choose the final hyperparameters. The manual tuning helped me find the rough values which could keep vehicle on the track and twiddle helped to further tune the parameters to get the final result with minimum CTE errors.

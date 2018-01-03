@@ -5,6 +5,7 @@
 #include "Twiddle.h"
 #include <math.h>
 #include <string.h>
+#include <fstream>
 
 // for convenience
 using json = nlohmann::json;
@@ -58,8 +59,8 @@ int main(int argc, char *argv[])
         std::cout << "Kp: " << Kp << ", Ki: " << Ki << ", Kd: " << Kd << std::endl;
         pid.Init(Kp, Ki, Kd);
     }
-    
-    h.onMessage([&twiddle, &pid, &twiddle_mode](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+    std::vector<double> all_ctes;
+    h.onMessage([&twiddle, &pid, &twiddle_mode, &all_ctes](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
         // "42" at the start of the message means there's a websocket message event.
         // The 4 signifies a websocket message
         // The 2 signifies a websocket event
@@ -85,6 +86,7 @@ int main(int argc, char *argv[])
                             send_steer_value = false;
                         }
                     } else {
+                        all_ctes.push_back(cte);
                         pid.UpdateError(cte);
                     }
                     if (send_steer_value) {
@@ -149,9 +151,17 @@ int main(int argc, char *argv[])
         }
     });
     
-    h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code, char *message, size_t length) {
-        ws.close();
+    h.onDisconnection([&h, &all_ctes](uWS::WebSocket<uWS::SERVER> ws, int code, char *message, size_t length) {
+        // Leo: must NOT call ws.close()
+        // ws.close();
         std::cout << "Disconnected" << std::endl;
+        if (all_ctes.size() > 0) {
+            std::ofstream output_file("./all_ctes.txt");
+            std::ostream_iterator<std::string> output_iterator(output_file, " ");
+            for (const auto &cte : all_ctes) {
+                output_file << cte << " ";
+            }
+        }
     });
     
     int port = 4567;
@@ -166,3 +176,4 @@ int main(int argc, char *argv[])
     }
     h.run();
 }
+
